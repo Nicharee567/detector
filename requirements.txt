@@ -1,0 +1,15 @@
+flask
+flask-cors
+google-generativeai
+youtube-transcript-api
+anthropic
+flask_sqlalchemy
+requests
+beautifulsoup4
+flask-admin
+Pillow
+
+flask-jwt-extended
+flask-bcrypt
+flask-cors
+gunicorn

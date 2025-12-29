@@ -1,0 +1,13 @@
+venv/
+__pycache__/
+*.pyc
+instance/
+.pytest_cache/
+.vscode/
+node_modules/
+frontend/mental-next/node_modules/
+frontend/mental-next/.next/
+*.db
+*.sqlite3
+.env
+.DS_Store
