@@ -50,21 +50,59 @@ const PsychiatristDashboard = ({ onBack }) => {
         }
     };
 
-    const handleExport = () => {
-        // For export, we might need to handle auth differently (e.g. download via blob)
-        // For now, assuming browser handles it if we pass token in query param or similar
-        // But standard window.open won't send headers. 
-        // Let's just use the existing method for now, assuming it might fail without auth or we need to implement a proper download handler.
-        // A better way for auth download:
-        axios.get(`${API_BASE}/export/red-cases`, { ...getAuthHeader(), responseType: 'blob' })
-            .then((response) => {
-                const url = window.URL.createObjectURL(new Blob([response.data]));
-                const link = document.createElement('a');
-                link.href = url;
-                link.setAttribute('download', 'red_cases.json'); // API returns JSON currently, ideally CSV
-                document.body.appendChild(link);
-                link.click();
+    const handleExport = async () => {
+        try {
+            // Dynamically import jsPDF to avoid SSR issues if any
+            const jsPDF = (await import('jspdf')).default;
+            const autoTable = (await import('jspdf-autotable')).default;
+
+            const doc = new jsPDF();
+
+            // fetch latest data
+            const response = await axios.get(`${API_BASE}/export/red-cases`, getAuthHeader());
+            const data = response.data;
+
+            // Header
+            doc.setFontSize(18);
+            doc.setTextColor(40);
+            doc.text("Mental Health Critical Cases Report (RED)", 14, 22);
+
+            doc.setFontSize(11);
+            doc.setTextColor(100);
+            const dateStr = new Date().toLocaleString('th-TH');
+            doc.text(`Generated on: ${dateStr}`, 14, 30);
+
+            // Table
+            const tableColumn = ["Patient ID", "Name", "Age", "Status", "Last Update", "Risk Reason"];
+            const tableRows = [];
+
+            data.forEach(ticket => {
+                const ticketData = [
+                    ticket.ID,
+                    ticket.Name,
+                    ticket.Age,
+                    ticket.Status,
+                    new Date(ticket.Last_Update).toLocaleDateString(),
+                    ticket.Risk_Reason
+                ];
+                tableRows.push(ticketData);
             });
+
+            autoTable(doc, {
+                head: [tableColumn],
+                body: tableRows,
+                startY: 40,
+                styles: { fontSize: 10, cellPadding: 3 },
+                headStyles: { fillColor: [239, 68, 68] }, // Red header
+                alternateRowStyles: { fillColor: [254, 242, 242] }
+            });
+
+            doc.save(`Critical_Cases_Report_${Date.now()}.pdf`);
+
+        } catch (err) {
+            console.error("Export Error:", err);
+            alert("Failed to generate PDF report");
+        }
     };
 
     // Calculate Stats

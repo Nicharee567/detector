@@ -36,11 +36,29 @@ class MentalHealthAnalyzer:
             'yellow': ['เหนื่อย', 'ท้อแท้', 'โดดเดี่ยว', 'ไม่มีความหมาย'],
             'green': ['มีความสุข', 'ดีใจ', 'สนุก', 'รัก']
         }
+
+    def preprocess_text(self, text):
+        """
+        3.1.2 Text Preprocessing: Clean and partial normalize text before sending to AI
+        """
+        if not text:
+            return ""
+        
+        # 1. Remove extra whitespaces
+        text = " ".join(text.split())
+        
+        # 2. Basic cleaning 
+        # For now, we keep most chars because AI needs context (emojis etc.)
+        
+        return text.strip()
     
     def analyze_text(self, message):
         """
         วิเคราะห์ข้อความด้วย AI
         """
+        # Step 1: Preprocessing
+        message = self.preprocess_text(message)
+
         if not self.model and self.ai_provider == 'gemini':
              return {
                 'level': 'ERROR',
@@ -217,17 +235,19 @@ class MentalHealthAnalyzer:
             except Exception as e:
                 lyrics = "(ไม่พบเนื้อเพลง/คำบรรยาย - วิเคราะห์จากชื่อคลิปแทน)"
             
-            # 3. สร้าง Prompt สำหรับวิเคราะห์สื่อ
+            # 3. สร้าง Prompt สำหรับวิเคราะห์สื่อ (2.1.2 High-Level Audio Features)
             analysis_message = f"""
             [วิเคราะห์สื่อที่ผู้ใช้กำลังรับชม/ฟัง]
-            ประเภท: YouTube Video
-            ชื่อคลิป: {video_title}
-            เนื้อหา/เนื้อเพลง (บางส่วน): "{lyrics[:1500]}"
+            ประเภท: YouTube Music/Video
             
-            คำสั่ง: วิเคราะห์ว่าเพลงหรือคลิปนี้สะท้อนอารมณ์หรือความเสี่ยงทางจิตใจของผู้แชร์อย่างไร?
-            - เพลงเศร้า/อกหัก/อยากตาย หรือไม่?
-            - เป็นคลิปข่าวด้านลบ/หดหู่ หรือไม่?
-            - หรือเป็นแค่เพลงรัก/ตลก/ทั่วไป?
+            High-Level Audio Features extracted:
+            - **Title/Context**: {video_title}
+            - **Lyrics/Transcript**: "{lyrics[:1500]}"
+            
+            คำสั่ง: วิเคราะห์ว่า "Audio Features" เหล่านี้ (เนื้อหาเพลง, ชื่อเพลง) สะท้อนอารมณ์หรือความเสี่ยงทางจิตใจของผู้แชร์อย่างไร? (Sentiment & Risk Analysis)
+            - เพลงเศร้า/อกหัก/อยากตาย (Depressive/Suicidal Ideation) หรือไม่?
+            - เป็นคลิปข่าวด้านลบ/หดหู่ (Negative Stimuli) หรือไม่?
+            - หรือเป็นแค่เพลงรัก/ตลก/ทั่วไป (Normal/Common)?
             """
             
             return self.analyze_text(analysis_message)
@@ -237,13 +257,31 @@ class MentalHealthAnalyzer:
         except Exception as e:
             return {'error': f'ไม่สามารถวิเคราะห์วิดีโอได้: {str(e)}'}
 
+    def preprocess_image(self, image):
+        """
+        4.1.2 Image Preprocessing: Resize and normalize format
+        """
+        # Convert to RGB (standardize format)
+        if image.mode != 'RGB':
+            image = image.convert('RGB')
+            
+        # Resize if too large (Optimization)
+        max_size = (1024, 1024)
+        image.thumbnail(max_size, Image.LANCZOS)
+        
+        return image
+
     def analyze_image(self, image_data):
         """
         วิเคราะห์รูปภาพหาความเสี่ยง (Self-harm, Depression, Threat)
         """
         try:
-            # Convert bytes to PIL Image
-            image = Image.open(io.BytesIO(image_data))
+            # 4.1 Data Preparation
+            # Convert bytes to PIL Image (4.1.1)
+            raw_image = Image.open(io.BytesIO(image_data))
+            
+            # Preprocessing (4.1.2)
+            image = self.preprocess_image(raw_image)
             
             prompt = """
             คุณเป็นผู้เชี่ยวชาญด้านจิตเวชและนิติเวช (Forensic Psychiatrist)
