@@ -204,66 +204,168 @@ const AdminDashboard = ({ onLogout }) => {
                             </div>
                         )}
 
-                        {/* USERS TAB */}
+                        {/* USERS TAB - STUDENT LIST */}
                         {activeTab === 'users' && (
                             <div className="animate-fade-in-up">
-                                <div className="glass-card rounded-[2rem] overflow-hidden">
-                                    <div className="p-8 border-b border-indigo-50 flex justify-between items-center bg-white/40 backdrop-blur-sm">
-                                        <h3 className="text-xl font-bold text-slate-800">User Management</h3>
-                                        <button
-                                            onClick={() => router.push('/register')}
-                                            className="btn-primary text-white px-6 py-2 rounded-xl text-sm font-bold shadow-md shadow-indigo-500/20"
-                                        >
-                                            + Add New User
-                                        </button>
+                                <div className="glass-card rounded-[2rem] overflow-hidden min-h-[600px] relative">
+                                    {/* Toolbar */}
+                                    <div className="p-8 border-b border-indigo-50 flex flex-col md:flex-row justify-between items-center bg-white/40 backdrop-blur-sm gap-4">
+                                        <div>
+                                            <h3 className="text-2xl font-bold text-slate-800">รายชื่อนักศึกษาทุกระดับ</h3>
+                                            <p className="text-slate-500 text-sm">จัดการข้อมูลและนัดหมายนักศึกษา</p>
+                                        </div>
+
+                                        <div className="flex gap-3 w-full md:w-auto">
+                                            <div className="relative flex-1 md:w-64">
+                                                <input
+                                                    type="text"
+                                                    placeholder="🔍 Search name, id..."
+                                                    value={searchTerm}
+                                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                                    className="w-full pl-10 pr-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-400 outline-none bg-white/80"
+                                                />
+                                            </div>
+                                            <button
+                                                onClick={() => router.push('/register')}
+                                                className="btn-primary text-white px-4 py-2 rounded-xl text-sm font-bold shadow-md shadow-indigo-500/20 whitespace-nowrap"
+                                            >
+                                                + เพิ่มนักศึกษา
+                                            </button>
+                                        </div>
                                     </div>
+
+                                    {/* Table */}
                                     <div className="overflow-x-auto">
-                                        <table className="w-full text-left">
-                                            <thead className="bg-slate-50/50">
+                                        <table className="w-full text-left border-collapse">
+                                            <thead className="bg-indigo-50/50 text-slate-500 text-xs uppercase tracking-wider font-bold">
                                                 <tr>
-                                                    <th className="p-6 font-bold text-slate-400 text-xs uppercase tracking-wider">User ID</th>
-                                                    <th className="p-6 font-bold text-slate-400 text-xs uppercase tracking-wider">Name</th>
-                                                    <th className="p-6 font-bold text-slate-400 text-xs uppercase tracking-wider">Role</th>
-                                                    <th className="p-6 font-bold text-slate-400 text-xs uppercase tracking-wider">Status</th>
-                                                    <th className="p-6 font-bold text-slate-400 text-xs uppercase tracking-wider text-right">Action</th>
+                                                    <th className="p-6">ชื่อ-สกุล</th>
+                                                    <th className="p-6">คณะ</th>
+                                                    <th className="p-6">ชั้นปี</th>
+                                                    <th className="p-6">เบอร์โทร</th>
+                                                    <th className="p-6">อาการ</th>
+                                                    <th className="p-6">ระดับอาการ</th>
+                                                    <th className="p-6 text-center">การนัดหมาย</th>
+                                                    <th className="p-6 text-center">Action</th>
                                                 </tr>
                                             </thead>
-                                            <tbody className="divide-y divide-slate-100">
-                                                {users.map(u => (
-                                                    <tr key={u.id} className="hover:bg-indigo-50/30 transition-colors">
-                                                        <td className="p-6 font-bold text-indigo-900">{u.id}</td>
-                                                        <td className="p-6 text-slate-600 font-medium">{u.name}</td>
-                                                        <td className="p-6">
-                                                            <span className={`px-3 py-1 rounded-lg text-xs font-bold 
-                                                                ${u.id.toUpperCase().startsWith('ADMIN') ? 'bg-purple-100 text-purple-700' :
-                                                                    u.id.toUpperCase().startsWith('DR') ? 'bg-blue-100 text-blue-700' :
-                                                                        u.id.toUpperCase().startsWith('T') ? 'bg-amber-100 text-amber-700' :
-                                                                            'bg-slate-100 text-slate-600'
-                                                                }`}>
-                                                                {u.id.toUpperCase().startsWith('ADMIN') ? 'ADMIN' :
-                                                                    u.id.toUpperCase().startsWith('DR') ? 'PSYCHIATRIST' :
-                                                                        u.id.toUpperCase().startsWith('T') ? 'THERAPIST' : 'PATIENT'}
-                                                            </span>
-                                                        </td>
-                                                        <td className="p-6">
-                                                            <span className={`flex items-center gap-2 text-sm font-bold ${u.status === 'RED' ? 'text-red-500' : u.status === 'YELLOW' ? 'text-amber-500' : 'text-emerald-500'}`}>
-                                                                <span className={`w-2 h-2 rounded-full ${u.status === 'RED' ? 'bg-red-500' : u.status === 'YELLOW' ? 'bg-amber-500' : 'bg-emerald-500'}`}></span>
-                                                                {u.status || 'UNKNOWN'}
-                                                            </span>
-                                                        </td>
-                                                        <td className="p-6 text-right">
-                                                            <button
-                                                                onClick={() => handleDeleteUser(u.id)}
-                                                                className="text-slate-400 hover:text-red-500 hover:bg-red-50 p-2 rounded-lg transition-all"
-                                                                title="Delete User"
-                                                            >
-                                                                🗑 Delete
-                                                            </button>
+                                            <tbody className="divide-y divide-indigo-50/50">
+                                                {paginatedUsers.length > 0 ? (
+                                                    paginatedUsers.map((u, index) => {
+                                                        // Mock data for missing fields
+                                                        const userHash = u.id.split('').reduce((a, b) => a + b.charCodeAt(0), 0);
+                                                        const faculty = ['วิศวกรรมศาสตร์', 'บริหารธุรกิจ', 'มนุษยศาสตร์', 'วิทยาศาสตร์'][userHash % 4];
+                                                        const year = (userHash % 4) + 1;
+                                                        const phone = `08${userHash % 10}-${(userHash * 2) % 1000}-${(userHash * 3) % 10000}`;
+
+                                                        return (
+                                                            <tr key={u.id} className="hover:bg-indigo-50/30 transition-colors group">
+                                                                <td className="p-6">
+                                                                    <div className="flex flex-col">
+                                                                        <span className="font-bold text-slate-700">{u.name}</span>
+                                                                        <span className="text-xs text-slate-400">{u.id}</span>
+                                                                    </div>
+                                                                </td>
+                                                                <td className="p-6 text-slate-600">{faculty}</td>
+                                                                <td className="p-6 text-slate-600">{year}</td>
+                                                                <td className="p-6 text-slate-600 font-mono text-xs">{phone}</td>
+                                                                <td className="p-6 text-slate-600 max-w-xs truncate" title={u.status === 'RED' ? 'มีความเสี่ยงสูง' : 'ปกติ'}>
+                                                                    {u.status === 'RED' ? 'คลั่งรักเด็กดื้อ (Risk)' : u.status === 'YELLOW' ? 'ซึมเศร้าเล็กน้อย' : 'ปกติ'}
+                                                                </td>
+                                                                <td className="p-6">
+                                                                    <span className={`px-3 py-1 rounded-full text-xs font-bold border ${u.status === 'RED' ? 'bg-red-100 text-red-600 border-red-200' :
+                                                                            u.status === 'YELLOW' ? 'bg-amber-100 text-amber-600 border-amber-200' :
+                                                                                u.status === 'GREEN' ? 'bg-emerald-100 text-emerald-600 border-emerald-200' :
+                                                                                    'bg-slate-100 text-slate-600 border-slate-200'
+                                                                        }`}>
+                                                                        {u.status || 'Unknown'}
+                                                                    </span>
+                                                                </td>
+                                                                <td className="p-6 text-center">
+                                                                    <button
+                                                                        onClick={() => {
+                                                                            setSelectedUserForAppointment(u);
+                                                                            setShowAppointmentModal(true);
+                                                                        }}
+                                                                        className="w-10 h-10 rounded-lg border border-indigo-200 text-indigo-500 hover:bg-indigo-500 hover:text-white transition-all flex items-center justify-center mx-auto shadow-sm"
+                                                                        title="เพิ่มการนัดหมาย"
+                                                                    >
+                                                                        📝
+                                                                    </button>
+                                                                </td>
+                                                                <td className="p-6 text-center">
+                                                                    <button
+                                                                        onClick={() => handleDeleteUser(u.id)}
+                                                                        className="text-slate-400 hover:text-red-500 p-2 transition-colors"
+                                                                        title="ลบข้อมูล"
+                                                                    >
+                                                                        🗑
+                                                                    </button>
+                                                                </td>
+                                                            </tr>
+                                                        );
+                                                    })
+                                                ) : (
+                                                    <tr>
+                                                        <td colSpan="8" className="p-10 text-center text-slate-400">
+                                                            ไม่พบข้อมูลนักศึกษาที่ค้นหา
                                                         </td>
                                                     </tr>
-                                                ))}
+                                                )}
                                             </tbody>
                                         </table>
+                                    </div>
+
+                                    {/* Simple Pagination Mock */}
+                                    <div className="p-6 border-t border-indigo-50 flex justify-end gap-2 bg-white/40">
+                                        <button className="px-4 py-2 rounded-lg bg-white border border-slate-200 text-slate-400 text-sm disabled:opacity-50" disabled>Previous</button>
+                                        <button className="px-4 py-2 rounded-lg bg-indigo-500 text-white text-sm font-bold shadow-md shadow-indigo-500/30">1</button>
+                                        <button className="px-4 py-2 rounded-lg bg-white border border-slate-200 text-slate-600 text-sm hover:bg-slate-50">2</button>
+                                        <button className="px-4 py-2 rounded-lg bg-white border border-slate-200 text-slate-600 text-sm hover:bg-slate-50">Next</button>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Appointment Modal */}
+                        {showAppointmentModal && selectedUserForAppointment && (
+                            <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in">
+                                <div className="bg-white rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden animate-scale-in">
+                                    <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                                        <h3 className="text-xl font-bold text-slate-800">เพิ่มการนัดหมาย</h3>
+                                        <button onClick={() => setShowAppointmentModal(false)} className="text-slate-400 hover:text-slate-600 text-2xl">✕</button>
+                                    </div>
+                                    <div className="p-8 space-y-6">
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <div>
+                                                <label className="block text-xs font-bold text-slate-500 uppercase mb-2">ชื่อ</label>
+                                                <input type="text" value={selectedUserForAppointment.name.split(' ')[0] || ''} readOnly className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-600" />
+                                            </div>
+                                            <div>
+                                                <label className="block text-xs font-bold text-slate-500 uppercase mb-2">นามสกุล</label>
+                                                <input type="text" value={selectedUserForAppointment.name.split(' ').slice(1).join(' ') || 'นักศึกษา'} readOnly className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-600" />
+                                            </div>
+                                        </div>
+
+                                        <div>
+                                            <label className="block text-xs font-bold text-slate-500 uppercase mb-2">เรื่องที่นัดหมาย</label>
+                                            <input type="text" placeholder="เช่น นัดติดตามผลอาการ..." className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500/20 outline-none" />
+                                        </div>
+
+                                        <div>
+                                            <label className="block text-xs font-bold text-slate-500 uppercase mb-2">วันที่และเวลา</label>
+                                            <input type="datetime-local" className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500/20 outline-none" />
+                                        </div>
+
+                                        <button
+                                            onClick={() => {
+                                                alert(`บันทึกการนัดหมายสำเร็จสำหรับ: ${selectedUserForAppointment.name}`);
+                                                setShowAppointmentModal(false);
+                                            }}
+                                            className="w-full btn-primary text-white py-4 rounded-xl font-bold shadow-lg shadow-indigo-500/20 text-lg mt-4"
+                                        >
+                                            บันทึกการนัดหมาย
+                                        </button>
                                     </div>
                                 </div>
                             </div>
