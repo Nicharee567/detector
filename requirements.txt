@@ -13,3 +13,4 @@ flask-jwt-extended
 flask-bcrypt
 flask-cors
 gunicorn
+psycopg2-binary

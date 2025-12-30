@@ -14,8 +14,12 @@ app = Flask(__name__)
 CORS(app)
 
 # Database Configuration
-# For now, we use SQLite. To switch to PostgreSQL, just change this URI.
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///mental_health_v3.db'
+# Use PostgreSQL if DATABASE_URL is set (Prod), otherwise use SQLite (Dev)
+database_url = os.environ.get('DATABASE_URL')
+if database_url and database_url.startswith("postgres://"):
+    database_url = database_url.replace("postgres://", "postgresql://", 1)
+
+app.config['SQLALCHEMY_DATABASE_URI'] = database_url or 'sqlite:///mental_health_v3.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = 'dev-secret-key' # Required for Flask-Admin
 app.config['JWT_SECRET_KEY'] = 'jwt-secret-key-change-this-in-prod'
