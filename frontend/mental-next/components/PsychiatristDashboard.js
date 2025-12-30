@@ -313,29 +313,29 @@ const PsychiatristDashboard = ({ onBack }) => {
                                                     <td className="p-6 pl-8 font-bold text-slate-700">
                                                         <div className="flex items-center gap-4">
                                                             <div className="w-12 h-12 rounded-2xl bg-white shadow-sm border border-indigo-50 text-indigo-600 flex items-center justify-center font-black text-sm group-hover:scale-110 group-hover:shadow-md transition-all duration-300">
-                                                                {c.user_id.substring(0, 2)}
+                                                                {c.ID.substring(0, 2)}
                                                             </div>
-                                                            <span className="text-lg tracking-tight">{c.user_id}</span>
+                                                            <span className="text-lg tracking-tight">{c.ID}</span>
                                                         </div>
                                                     </td>
                                                     <td className="p-6">
                                                         <div className="flex items-center gap-4">
                                                             <div className="flex-1 h-3 w-32 bg-slate-100 rounded-full overflow-hidden shadow-inner ring-1 ring-black/5">
-                                                                <div className={`h-full rounded-full transition-all duration-1000 ease-out ${c.score >= 8 ? 'bg-gradient-to-r from-red-500 to-rose-600' : 'bg-gradient-to-r from-orange-400 to-red-400'}`} style={{ width: `${(c.score / 10) * 100}%` }}></div>
+                                                                <div className={`h-full rounded-full transition-all duration-1000 ease-out ${c.Score >= 8 ? 'bg-gradient-to-r from-red-500 to-rose-600' : 'bg-gradient-to-r from-orange-400 to-red-400'}`} style={{ width: `${(c.Score / 10) * 100}%` }}></div>
                                                             </div>
-                                                            <span className={`font-black text-xl ${c.score >= 8 ? 'text-red-600' : 'text-orange-500'}`}>{c.score}</span>
+                                                            <span className={`font-black text-xl ${c.Score >= 8 ? 'text-red-600' : 'text-orange-500'}`}>{c.Score}</span>
                                                         </div>
                                                     </td>
                                                     <td className="p-6 max-w-xs">
-                                                        <div className="truncate text-slate-600 font-medium px-3 py-1.5 rounded-lg bg-white/50 border border-white/60 w-fit backdrop-blur-sm" title={c.reason}>
-                                                            {c.reason}
+                                                        <div className="truncate text-slate-600 font-medium px-3 py-1.5 rounded-lg bg-white/50 border border-white/60 w-fit backdrop-blur-sm" title={c.Risk_Reason}>
+                                                            {c.Risk_Reason}
                                                         </div>
                                                     </td>
                                                     <td className="p-6 text-sm text-slate-500 font-medium">
-                                                        {new Date(c.timestamp).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' })}
+                                                        {new Date(c.Last_Update).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' })}
                                                     </td>
                                                     <td className="p-6 pr-8 text-right">
-                                                        <button onClick={() => setSelectedPatientId(c.user_id)} className="text-sm bg-white border border-indigo-100 text-indigo-600 hover:bg-indigo-600 hover:text-white px-6 py-3 rounded-xl font-bold transition-all shadow-sm hover:shadow-lg hover:shadow-indigo-500/20 active:scale-95">
+                                                        <button onClick={() => setSelectedPatientId(c.ID)} className="text-sm bg-white border border-indigo-100 text-indigo-600 hover:bg-indigo-600 hover:text-white px-6 py-3 rounded-xl font-bold transition-all shadow-sm hover:shadow-lg hover:shadow-indigo-500/20 active:scale-95">
                                                             View History
                                                         </button>
                                                     </td>

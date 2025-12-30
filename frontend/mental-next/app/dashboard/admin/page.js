@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Dashboard from '@/components/Dashboard';
+import AdminDashboard from '@/components/AdminDashboard';
 
 export default function Page() {
     const router = useRouter();
@@ -24,7 +24,7 @@ export default function Page() {
 
     if (!authorized) return null;
 
-    return <Dashboard
+    return <AdminDashboard
         onLogout={() => {
             localStorage.removeItem('token');
             localStorage.removeItem('user');

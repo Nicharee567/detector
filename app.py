@@ -307,6 +307,7 @@ def export_red_cases():
             if user.analyses:
                 sorted_analyses = sorted(user.analyses, key=lambda x: x.timestamp, reverse=True)
                 latest_reason = sorted_analyses[0].reason
+                latest_score = sorted_analyses[0].score
                 
             red_cases.append({
                 'ID': user.id,
@@ -314,7 +315,8 @@ def export_red_cases():
                 'Age': user.age,
                 'Status': 'RED',
                 'Last_Update': user_data['last_update'],
-                'Risk_Reason': latest_reason
+                'Risk_Reason': latest_reason,
+                'Score': latest_score if user.analyses else 0
             })
             
     return jsonify(red_cases)
@@ -347,6 +349,34 @@ def mark_notification_read(id):
         db.session.commit()
         return jsonify({"message": "Marked as read"})
     return jsonify({"error": "Notification not found"}), 404
+
+@app.route('/api/users', methods=['GET'])
+@jwt_required()
+def get_all_users():
+    # Only allow admin? For now assume valid JWT is enough or check role
+    current_user_id = get_jwt_identity()
+    if not current_user_id.upper().startswith('ADMIN'):
+        return jsonify({"error": "Unauthorized"}), 403
+        
+    users = User.query.all()
+    return jsonify([u.to_dict() for u in users])
+
+@app.route('/api/users/<user_id>', methods=['DELETE'])
+@jwt_required()
+def delete_user(user_id):
+    current_user_id = get_jwt_identity()
+    if not current_user_id.upper().startswith('ADMIN'):
+        return jsonify({"error": "Unauthorized"}), 403
+        
+    user = User.query.get(user_id)
+    if user:
+        # Delete associated data first if cascading isn't set up (it is lazy, likely need manual delete)
+        AnalysisResult.query.filter_by(user_id=user_id).delete()
+        Notification.query.filter_by(user_id=user_id).delete()
+        db.session.delete(user)
+        db.session.commit()
+        return jsonify({"message": f"User {user_id} deleted"})
+    return jsonify({"error": "User not found"}), 404
 
 @app.route('/api/analytics', methods=['GET'])
 @jwt_required()
